@@ -12,13 +12,13 @@ public class Output
 {
 
     [XmlElement("Totals")]
-    public Totals Totals { get; set; }
+    public Totals? Totals { get; set; }
 
     [XmlElement("MaxEmissionGenerators")]
-    public MaxEmissionGenerators MaxEmissionGenerators { get; set; }
+    public MaxEmissionGenerators? MaxEmissionGenerators { get; set; }
 
     [XmlElement("ActualHeatRates")]
-    public ActualHeatRates ActualHeatRates { get; set; }
+    public ActualHeatRates? ActualHeatRates { get; set; }
     public Output ()
     {
 
@@ -28,19 +28,19 @@ public class Output
     {
         Totals = new Totals ();
         Totals.Generators =
-                report.Coal.CoalGenerators.Select(g => new GeneratorTotal(g, data, factors))
-                    .Concat(report.Gas.GasGenerators.Select(g => new GeneratorTotal(g, data, factors)))
-                    .Concat(report.Wind.WindGenerators.Select(g => new GeneratorTotal(g, data, factors)))
+                report.Coal!.CoalGenerators!.Select(g => new GeneratorTotal(g, data, factors))
+                    .Concat(report.Gas!.GasGenerators!.Select(g => new GeneratorTotal(g, data, factors)))
+                    .Concat(report.Wind!.WindGenerators!.Select(g => new GeneratorTotal(g, data, factors)))
                     .ToList();
 
         MaxEmissionGenerators = new MaxEmissionGenerators();
         MaxEmissionGenerators.Day =
-                report.Coal.CoalGenerators.SelectMany(g => g.Generations.SelectMany(gg => gg.Days.Select(d => new OutputDay(g, d, data, factors))))
-                    .Concat(report.Gas.GasGenerators.SelectMany(g => g.Generations.SelectMany(gg => gg.Days.Select(d => new OutputDay(g, d, data, factors)))))
+                report.Coal.CoalGenerators!.SelectMany(g => g.Generations.SelectMany(gg => gg.Days!.Select(d => new OutputDay(g, d, data, factors))))
+                    .Concat(report.Gas.GasGenerators!.SelectMany(g => g.Generations.SelectMany(gg => gg.Days!.Select(d => new OutputDay(g, d, data, factors)))))
                     .ToList();
         ActualHeatRates = new ActualHeatRates();
         ActualHeatRates.CoalGenerator = 
-                report.Coal.CoalGenerators.Select(g => new CoalGeneratorOutput() { Name = g.Name, HeatRate = g.TotalHeatInput / g.ActualNetGeneration})
+                report.Coal.CoalGenerators!.Select(g => new CoalGeneratorOutput() { Name = g.Name!, HeatRate = g.TotalHeatInput / g.ActualNetGeneration})
                     .ToList();
     }
 }
@@ -48,13 +48,13 @@ public class Output
 public class Totals
 {
     [XmlElement("Generator")]
-    public List<GeneratorTotal> Generators { get; set; }
+    public List<GeneratorTotal>? Generators { get; set; }
 }
 
 public class GeneratorTotal
 {
     [XmlElement("Name")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     [XmlElement("Total")]
     public double Total { get; set; }
@@ -64,7 +64,7 @@ public class GeneratorTotal
     public GeneratorTotal(EnergyGenerator generator, ReferenceData data, AllFactors factors)
     {
         Name = generator.Name;
-        var factor = factors.GetValueFactor(Name, data);
+        var factor = factors.GetValueFactor(Name!, data);
         Total = generator.TotalGeneration * factor;  
     }
 }
@@ -72,13 +72,13 @@ public class GeneratorTotal
 public class MaxEmissionGenerators
 {
     [XmlElement("Day")]
-    public List<OutputDay> Day { get; set; }
+    public List<OutputDay>? Day { get; set; }
 }
 
 public class OutputDay
 {
     [XmlElement("Name")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     [XmlElement("Date")]
     public DateTime Date { get; set; }
@@ -93,7 +93,7 @@ public class OutputDay
     {
         Name = generator.Name;
         Date = day.Date;
-        var factor = factors.GetEmissionFactor(Name, data);
+        var factor = factors.GetEmissionFactor(Name!, data);
         Emission = day.Energy * generator.EmissionsRating * factor;
     }
 }
@@ -101,25 +101,17 @@ public class OutputDay
 public class ActualHeatRates
 {
     [XmlElement("CoalGenerator")]
-    public List<CoalGeneratorOutput> CoalGenerator { get; set; }
-    public ActualHeatRates()
-    {
-
-    }
+    public List<CoalGeneratorOutput>? CoalGenerator { get; set; }
 }
 
 public class CoalGeneratorOutput
 {
 
     [XmlElement("Name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [XmlElement("HeatRate")]
     public double HeatRate { get; set; }
-    public CoalGeneratorOutput()
-    {
-
-    }
 }
 
 

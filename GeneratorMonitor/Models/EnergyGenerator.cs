@@ -6,19 +6,19 @@ public abstract class EnergyGenerator
 {
 
     [XmlElement("Name")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     [XmlElement("Generation")]
     public required List<Generation> Generations { get; set; }
 
     [XmlIgnore]
-    public double TotalGeneration => Generations.Sum(g => g.Days.Sum(d => d.TotalGeneration));
+    public double TotalGeneration => Generations.Sum(g => g.Days!.Sum(d => d.TotalGeneration));
 }
 
 public class Generation
 {
     [XmlElement("Day")]
-    public List<Day> Days { get; set; }
+    public List<Day>? Days { get; set; }
 }
 
 public class Day

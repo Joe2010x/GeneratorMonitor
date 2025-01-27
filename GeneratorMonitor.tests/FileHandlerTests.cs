@@ -43,7 +43,7 @@ namespace GeneratorMonitor.Models.Tests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(expectedFactors.Count, result.Collections.Count);
+            Assert.Equal(expectedFactors.Count, result.Collections!.Count);
             Assert.Equal("Offshore Wind", result.Collections[0].GeneratorType);
             Assert.Equal("Low", result.Collections[0].ValueFactor);
             Assert.Equal("N/A", result.Collections[0].EmissionFactor);
