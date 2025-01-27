@@ -19,7 +19,8 @@ public class FolderMonitor : IDisposable
         var referencefile = config["FilePaths:BaseDirectory"] + config["FilePaths:SourceDirectory"] + config["FilePaths:ReferenceFile"];
         var sourcefactors = config["FilePaths:BaseDirectory"] + config["FilePaths:SourceDirectory"] + config["FilePaths:Factors"];
         var inputFolder = config["FilePaths:BaseDirectory"] + config["FilePaths:InputFolder"];
-
+        Console.WriteLine("reference file ", referencefile);
+        Console.WriteLine("input folder ", inputFolder);
         _outputFolder = config["FilePaths:BaseDirectory"] + config["FilePaths:OutputFolder"];
         _archiveFolder = config["FilePaths:BaseDirectory"] + config["FilePaths:ArchiveFolder"];
         _inputFolderName = inputFolder;

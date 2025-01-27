@@ -1,8 +1,8 @@
-﻿using CsvHelper;
-using GeneratorMonitor.Models;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Xml;
 using System.Xml.Serialization;
+using CsvHelper;
+using GeneratorMonitor.Models;
 
 namespace GeneratorMonitor.Services;
 
@@ -17,7 +17,7 @@ public class FileHandler
             csv.Context.RegisterClassMap<GeneratorMap>();
             factors = csv.GetRecords<GeneratorFactor>().ToList();
         }
-        return new AllFactors() { Collections = factors};
+        return new AllFactors() { Collections = factors };
     }
 
     public static T GetDeserialized<T>(string fileName)
@@ -26,14 +26,13 @@ public class FileHandler
         T result;
         using (FileStream fileStream = new FileStream(fileName, FileMode.Open))
         {
-            result = (T) serializer.Deserialize(fileStream);
+            result = (T)serializer.Deserialize(fileStream)!;
         }
         return result;
     }
 
-    public static void OutputFile<T>(T source, string fileName) 
+    public static void OutputFile<T>(T source, string fileName)
     {
-
         XmlSerializer serializer = new XmlSerializer(typeof(T));
         XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
         namespaces.Add(string.Empty, string.Empty);
@@ -41,7 +40,6 @@ public class FileHandler
         {
             serializer.Serialize(writer, source, namespaces);
         }
-
     }
 
     public static void MoveFileToDestinationFolder(string filePath, string destinationFolder)
@@ -49,8 +47,13 @@ public class FileHandler
         try
         {
             string fileName = Path.GetFileName(filePath);
-            if (!Directory.Exists(destinationFolder)) Directory.CreateDirectory(destinationFolder);
-            string destinationPath = UniqueFileName( Path.Combine(destinationFolder, fileName), destinationFolder, "archive");
+            if (!Directory.Exists(destinationFolder))
+                Directory.CreateDirectory(destinationFolder);
+            string destinationPath = UniqueFileName(
+                Path.Combine(destinationFolder, fileName),
+                destinationFolder,
+                "archive"
+            );
 
             File.Move(filePath, destinationPath);
             Console.WriteLine($"File moved to processed folder: {destinationPath}");
@@ -63,11 +66,13 @@ public class FileHandler
 
     public static string UniqueFileName(string fileName, string folderName, string tag)
     {
-        
-        if (File.Exists(fileName))
-        {
-            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            return Path.Combine(folderName, $"{tag}{Path.GetFileNameWithoutExtension(fileName)}_{timestamp}{Path.GetExtension(fileName)}");
-        } else return fileName;
+        var path = Path.Combine(folderName, $"{tag}{Path.GetFileName(fileName)}");
+        if (!File.Exists(path))
+            return path;
+        string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        return Path.Combine(
+            folderName,
+            $"{tag}{Path.GetFileNameWithoutExtension(fileName)}_{timestamp}{Path.GetExtension(fileName)}"
+        );
     }
 }
